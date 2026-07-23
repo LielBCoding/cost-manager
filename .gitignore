@@ -1,0 +1,13 @@
+# Node dependencies (reinstalled with `npm install`)
+node_modules/
+
+# Secrets - never commit real credentials
+.env
+
+# Postman workspace data (not part of the project)
+.postman/
+postman/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

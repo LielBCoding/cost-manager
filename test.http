@@ -1,0 +1,73 @@
+###############################################################################
+#  Cost Manager - manual request tester
+#
+#  HOW TO USE (great for the demo video):
+#  1. In VS Code install the extension "REST Client" (by Huachao Mao).
+#  2. Make sure the 4 services are running  (npm start in each folder).
+#  3. Click the small "Send Request" link that appears above each request
+#     below, and watch the JSON response open in a side panel.
+#
+#  For the deployed version, just change the 4 @base variables to your
+#  Render URLs (and remove the :PORT part).
+###############################################################################
+
+@logs   = http://localhost:3000
+@users  = http://localhost:3001
+@costs  = http://localhost:3002
+@about  = http://localhost:3003
+
+
+### 1) About - the development team (Admin service)
+GET {{about}}/api/about
+
+
+### 2) List all users
+GET {{users}}/api/users
+
+
+### 3) Add a new user
+POST {{users}}/api/add
+Content-Type: application/json
+
+{
+  "id": 200001,
+  "first_name": "demo",
+  "last_name": "user",
+  "birthday": "1995-05-20"
+}
+
+
+### 4) Get one user + their total costs
+GET {{users}}/api/users/123123
+
+
+### 5) Add a cost item (for the imaginary user 123123)
+POST {{costs}}/api/add
+Content-Type: application/json
+
+{
+  "userid": 123123,
+  "description": "milk 9",
+  "category": "food",
+  "sum": 8
+}
+
+
+### 6) Monthly report - current month
+GET {{costs}}/api/report?id=123123&year=2026&month=7
+
+
+### 7) List all logs (Admin service)
+GET {{logs}}/api/logs
+
+
+### 8) Example error - duplicate user (returns { id, message })
+POST {{users}}/api/add
+Content-Type: application/json
+
+{
+  "id": 123123,
+  "first_name": "mosh",
+  "last_name": "israeli",
+  "birthday": "1990-01-01"
+}

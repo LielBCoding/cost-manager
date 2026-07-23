@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב פרויקט — Cost Manager RESTful Web Services</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --card2:#273449; --text:#e2e8f0;
+    --muted:#94a3b8; --accent:#38bdf8; --green:#22c55e; --yellow:#eab308;
+    --gray:#475569; --border:#334155;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg);
+    color:var(--text); line-height:1.7; padding:24px;
+  }
+  .wrap{max-width:1000px; margin:0 auto}
+  header{
+    background:linear-gradient(135deg,#1e3a8a,#0369a1); border-radius:16px;
+    padding:28px 32px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,.4);
+  }
+  header h1{margin:0 0 6px; font-size:26px}
+  header p{margin:0; color:#cbe8ff}
+  .bar{background:var(--card); border-radius:12px; height:26px; overflow:hidden; margin:18px 0 6px; border:1px solid var(--border)}
+  .bar-fill{background:linear-gradient(90deg,#22c55e,#38bdf8); height:100%; width:0%; transition:width .5s; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; color:#04121f}
+  .stage{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:18px 22px; margin-bottom:14px; box-shadow:0 4px 14px rgba(0,0,0,.25);
+  }
+  .stage h2{margin:0 0 4px; font-size:19px; display:flex; align-items:center; gap:10px}
+  .stage .sub{color:var(--muted); font-size:14px; margin-bottom:10px}
+  .badge{font-size:12px; padding:3px 12px; border-radius:20px; font-weight:bold}
+  .done{background:rgba(34,197,94,.15); color:var(--green); border:1px solid var(--green)}
+  .active{background:rgba(234,179,8,.15); color:var(--yellow); border:1px solid var(--yellow)}
+  .todo{background:rgba(71,85,105,.2); color:var(--muted); border:1px solid var(--gray)}
+  ul.tasks{margin:8px 0 0; padding-inline-start:22px}
+  ul.tasks li{margin:4px 0; color:var(--text)}
+  ul.tasks li.d::marker{content:"✅ "}
+  ul.tasks li.a::marker{content:"⏳ "}
+  ul.tasks li.t{color:var(--muted)}
+  ul.tasks li.t::marker{content:"⬜ "}
+  .note{background:var(--card2); border-inline-start:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin-top:12px; font-size:14px}
+  footer{color:var(--muted); text-align:center; margin-top:26px; font-size:13px}
+  code{background:#0b1220; padding:2px 7px; border-radius:5px; color:#7dd3fc; font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🧾 Cost Manager — RESTful Web Services</h1>
+    <p>פרויקט גמר בקורס "פיתוח צד שרת" · מעקב התקדמות חי · עודכן לאחרונה: שלב 2</p>
+  </header>
+
+  <div class="bar"><div class="bar-fill" style="width:55%">55%</div></div>
+  <p style="color:var(--muted); font-size:13px; text-align:center">שלב 5 מתוך 9 · בדיקות אוטומטיות (Unit Tests)</p>
+
+  <!-- STAGE 0 -->
+  <div class="stage">
+    <h2>🛠️ שלב 0 — הכנת הסביבה <span class="badge done">הושלם</span></h2>
+    <div class="sub">מתקינים את הכלים שנצטרך כדי לפתח את הפרויקט</div>
+    <ul class="tasks">
+      <li class="d">בדיקת מה מותקן במחשב (Git קיים, Node חסר)</li>
+      <li class="d">התקנת <code>Node.js v24.18</code> (כולל <code>npm 11.16</code>)</li>
+      <li class="t">פתיחת חשבון <code>MongoDB Atlas</code> (נעשה בשלב 2)</li>
+    </ul>
+    <div class="note">💡 <b>מה זה Node.js?</b> סביבה שמריצה JavaScript על השרת. <b>npm</b> = חנות הספריות שממנה הורדנו את Express, Mongoose, Pino.</div>
+  </div>
+
+  <!-- STAGE 1 -->
+  <div class="stage">
+    <h2>🧭 שלב 1 — שלד 4 השירותים <span class="badge done">הושלם</span></h2>
+    <div class="sub">4 פרויקטים נפרדים (4 processes אמיתיים), כל אחד עם package.json משלו</div>
+    <ul class="tasks">
+      <li class="d"><code>a-logs-service</code> · פורט 3000 · <code>/api/logs</code></li>
+      <li class="d"><code>b-users-service</code> · פורט 3001 · <code>/api/users</code>, <code>/api/add</code></li>
+      <li class="d"><code>c-costs-service</code> · פורט 3002 · <code>/api/add</code>, <code>/api/report</code></li>
+      <li class="d"><code>d-about-service</code> · פורט 3003 · <code>/api/about</code></li>
+    </ul>
+    <div class="note">✅ הותקנו הספריות בכל שירות: express, mongoose, pino, pino-mongodb, dotenv + jest & supertest לבדיקות.</div>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="stage">
+    <h2>🗄️ שלב 2 — מסד הנתונים והמודלים <span class="badge done">הושלם</span></h2>
+    <div class="sub">בונים את ה-Schemas ב-Mongoose בתוך תיקיית <code>models</code></div>
+    <ul class="tasks">
+      <li class="d">מודל <code>User</code> (id:Number, first_name, last_name, birthday:Date)</li>
+      <li class="d">מודל <code>Cost</code> (description, category, userid, sum:<b>Double</b>)</li>
+      <li class="d">מודל <code>Log</code> · מודל <code>Report</code> (Computed Pattern)</li>
+      <li class="d">חשבון <code>MongoDB Atlas</code> נפתח + חיבור נבדק בהצלחה ✅</li>
+    </ul>
+    <div class="note">✅ מחובר למסד בענן בשם <code>cost_manager</code>. מחרוזת החיבור נשמרה בקובץ <code>.env</code> נפרד (לא בקוד).</div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="stage">
+    <h2>⚙️ שלב 3 — בניית ה-Endpoints <span class="badge done">הושלם</span></h2>
+    <div class="sub">כותבים את הלוגיקה של כל בקשה (Express.js) — נבדק חי מול כל 8 ה-endpoints</div>
+    <ul class="tasks">
+      <li class="d">הוספת משתמש / קבלת משתמש+total / רשימת משתמשים</li>
+      <li class="d">הוספת הוצאה / דו"ח חודשי (Computed Design Pattern)</li>
+      <li class="d">רשימת לוגים / פרטי צוות הפיתוח</li>
+      <li class="d">validation + הודעות שגיאה בפורמט <code>{id, message}</code></li>
+    </ul>
+    <div class="note">✅ כל ה-endpoints נבדקו חי: הוספה, דו"חות, total, כפילויות, קטגוריה שגויה — הכל מחזיר את התשובה הנכונה.</div>
+  </div>
+
+  <!-- STAGE 4 -->
+  <div class="stage">
+    <h2>📝 שלב 4 — לוגים (Pino) + קובץ .env <span class="badge done">הושלם</span></h2>
+    <div class="sub">רישום כל בקשה למסד הנתונים + ניהול סודות</div>
+    <ul class="tasks">
+      <li class="d">Pino כותב לוג ל-MongoDB על כל בקשה + כל גישה ל-endpoint</li>
+      <li class="d">קובץ <code>.env</code> בכל שירות (מחרוזת חיבור + פורט)</li>
+    </ul>
+    <div class="note">✅ נבדק חי: הלוגים נשמרים ל-collection בשם <code>logs</code> ונקראים דרך <code>/api/logs</code>.</div>
+  </div>
+
+  <!-- STAGE 5 -->
+  <div class="stage">
+    <h2>🧪 שלב 5 — בדיקות (Unit Tests) <span class="badge done">הושלם</span></h2>
+    <div class="sub">בדיקות אוטומטיות (Jest + Supertest) לכל endpoint</div>
+    <ul class="tasks">
+      <li class="d">about: 2 · logs: 2 · users: 6 · costs: 5 — <b>15 בדיקות, כולן עוברות ✅</b></li>
+      <li class="d">כל בדיקה מנקה אחריה — ה-DB נשאר נקי</li>
+    </ul>
+  </div>
+
+  <!-- STAGE 6 -->
+  <div class="stage">
+    <h2>▶️ שלב 6 — הרצה מקומית + בדיקת ה-Python <span class="badge todo">ממתין</span></h2>
+    <div class="sub">מריצים הכל על המחשב ומריצים את קוד הבדיקה מהמשימה</div>
+  </div>
+
+  <!-- STAGE 7 -->
+  <div class="stage">
+    <h2>☁️ שלב 7 — העלאה לאינטרנט (Deployment) <span class="badge todo">ממתין</span></h2>
+    <div class="sub">מעלים את 4 השירותים לשרת בענן ומקבלים 4 כתובות URL</div>
+  </div>
+
+  <!-- STAGE 8 -->
+  <div class="stage">
+    <h2>🎬 שלב 8 — סרטון + PDF + הגשה <span class="badge todo">ממתין</span></h2>
+    <div class="sub">מכינים את חומרי ההגשה לפי ההנחיות</div>
+  </div>
+
+  <footer>נבנה יחד עם Claude · הקובץ מתעדכן אוטומטית בסוף כל שלב</footer>
+</div>
+</body>
+</html>
