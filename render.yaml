@@ -1,0 +1,52 @@
+# Render Blueprint - creates all four services at once.
+# In Render: New + -> Blueprint -> pick the cost-manager repo -> Apply.
+# You will be asked once for MONGODB_URI (shared by all four services).
+
+envVarGroups:
+  - name: cost-manager-shared
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: DB_NAME
+        value: cost_manager
+
+services:
+  - type: web
+    name: logs-service
+    runtime: node
+    plan: free
+    rootDir: a-logs-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - fromGroup: cost-manager-shared
+
+  - type: web
+    name: users-service
+    runtime: node
+    plan: free
+    rootDir: b-users-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - fromGroup: cost-manager-shared
+
+  - type: web
+    name: costs-service
+    runtime: node
+    plan: free
+    rootDir: c-costs-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - fromGroup: cost-manager-shared
+
+  - type: web
+    name: about-service
+    runtime: node
+    plan: free
+    rootDir: d-about-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - fromGroup: cost-manager-shared
