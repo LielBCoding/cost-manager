@@ -52,8 +52,8 @@
     <p>פרויקט גמר בקורס "פיתוח צד שרת" · מעקב התקדמות חי · עודכן לאחרונה: שלב 2</p>
   </header>
 
-  <div class="bar"><div class="bar-fill" style="width:55%">55%</div></div>
-  <p style="color:var(--muted); font-size:13px; text-align:center">שלב 5 מתוך 9 · בדיקות אוטומטיות (Unit Tests)</p>
+  <div class="bar"><div class="bar-fill" style="width:72%">72%</div></div>
+  <p style="color:var(--muted); font-size:13px; text-align:center">שלב 7 מתוך 9 · העלאה לאינטרנט (Deployment)</p>
 
   <!-- STAGE 0 -->
   <div class="stage">
@@ -129,14 +129,26 @@
 
   <!-- STAGE 6 -->
   <div class="stage">
-    <h2>▶️ שלב 6 — הרצה מקומית + בדיקת ה-Python <span class="badge todo">ממתין</span></h2>
-    <div class="sub">מריצים הכל על המחשב ומריצים את קוד הבדיקה מהמשימה</div>
+    <h2>▶️ שלב 6 — הרצה מקומית + בדיקה חיה <span class="badge done">הושלם</span></h2>
+    <div class="sub">הרצנו את 4 השרתים ובדקנו כל endpoint חי מול MongoDB</div>
+    <ul class="tasks">
+      <li class="d">כל 8 ה-endpoints עובדים חי (about, users, costs, report, logs)</li>
+      <li class="d">validation מחוזק נבדק: תאריך-עבר נדחה, id בוליאני נדחה, id ריק נדחה</li>
+      <li class="d">בדיקת-על של 35 סוכנים — כל הממצאים תוקנו</li>
+      <li class="d">הפרויקט הועבר למיקום מקומי (מחוץ ל-OneDrive) + הועלה ל-Git</li>
+    </ul>
+    <div class="note">✅ 17 בדיקות אוטומטיות עוברות ללא DB · הקוד מקומי ב-Git עם commit ראשון.</div>
   </div>
 
   <!-- STAGE 7 -->
   <div class="stage">
-    <h2>☁️ שלב 7 — העלאה לאינטרנט (Deployment) <span class="badge todo">ממתין</span></h2>
-    <div class="sub">מעלים את 4 השירותים לשרת בענן ומקבלים 4 כתובות URL</div>
+    <h2>☁️ שלב 7 — העלאה לאינטרנט (Deployment) <span class="badge active">בעבודה</span></h2>
+    <div class="sub">מעלים את 4 השירותים ל-Render ומקבלים 4 כתובות URL</div>
+    <ul class="tasks">
+      <li class="a">יצירת GitHub repo (LielBCoding) + push</li>
+      <li class="t">חיבור Render ל-GitHub + 4 Web Services</li>
+      <li class="t">הגדרת MONGODB_URI בכל שירות + קבלת 4 כתובות</li>
+    </ul>
   </div>
 
   <!-- STAGE 8 -->
