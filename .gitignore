@@ -11,3 +11,9 @@ postman/
 # OS / editor noise
 .DS_Store
 Thumbs.db
+
+# submission artifacts
+*.zip
+*.docx
+*.pdf
+PROGRESS.html
