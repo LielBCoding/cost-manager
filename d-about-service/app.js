@@ -1,40 +1,37 @@
 // app.js
-// Builds the Express application: middleware, request logging and routes.
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const logger = require('./logger');
 const apiRouter = require('./routes/about.routes');
 
 const app = express();
 
-// Allow requests from any origin (so a browser client can call the API)
+// Middleware
 app.use(cors());
-
-// Parse incoming JSON and url-encoded request bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging middleware: writes a log for EVERY incoming HTTP request
+// Logging middleware - writes a log for every incoming request
 app.use((req, res, next) => {
   logger.info({ method: req.method, url: req.originalUrl }, 'incoming request');
   next();
 });
 
-// Simple landing route so that opening the service in a browser shows it is alive
+// Simple health check route
 app.get('/', (req, res) => {
   res.send('Hello from the About-Admin service (port ' + (process.env.PORT || 'unknown') + ')');
 });
 
-// Mount all endpoints under /api
+// Routes
 app.use('/api', apiRouter);
 
-// 404 handler for any unknown route
+// 404 handler for unknown routes
 app.use((req, res) => {
   res.status(404).json({ id: 404, message: 'not found: ' + req.originalUrl });
 });
 
-// Central error handler - always returns { id, message }
+// Error handler - returns a JSON document with id and message
 app.use((err, req, res, next) => {
   logger.error({ err: err.message }, 'unhandled error');
   res.status(500).json({ id: 500, message: err.message });
