@@ -8,6 +8,7 @@ const TEAM = require('../team');
 router.get('/about', (req, res) => {
   logger.info({ method: 'GET', url: '/api/about' }, 'about');
   try {
+    // keep only the two name fields, nothing else
     const team = TEAM.map((m) => ({ first_name: m.first_name, last_name: m.last_name }));
     return res.json(team);
   } catch (err) {

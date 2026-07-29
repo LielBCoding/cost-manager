@@ -54,6 +54,7 @@ router.post('/add', async (req, res) => {
       return sendError(res, 409, 'a user with id ' + idNum + ' already exists');
     }
 
+    // store the new user
     const user = await User.create({
       id: idNum,
       first_name: first_name.trim(),
@@ -61,6 +62,7 @@ router.post('/add', async (req, res) => {
       birthday: birthdayDate,
     });
 
+    // reply with the user that was added
     return res.status(201).json({
       id: user.id,
       first_name: user.first_name,
@@ -78,6 +80,7 @@ router.get('/users', async (req, res) => {
   logger.info({ method: 'GET', url: '/api/users' }, 'list users');
   try {
     const users = await User.find().lean();
+    // return only the collection fields
     const result = users.map((u) => ({
       id: u.id,
       first_name: u.first_name,
@@ -110,6 +113,7 @@ router.get('/users/:id', async (req, res) => {
     ]);
     const total = totals.length > 0 ? totals[0].total : 0;
 
+    // reply with the details and total
     return res.json({
       first_name: user.first_name,
       last_name: user.last_name,

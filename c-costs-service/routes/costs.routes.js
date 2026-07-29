@@ -68,6 +68,7 @@ router.post('/add', async (req, res) => {
       costDate = parsed;
     }
 
+    // store the new cost
     const cost = await Cost.create({
       description: description.trim(),
       category,
@@ -76,6 +77,7 @@ router.post('/add', async (req, res) => {
       date: costDate,
     });
 
+    // reply with the cost that was added
     return res.status(201).json({
       description: cost.description,
       category: cost.category,
