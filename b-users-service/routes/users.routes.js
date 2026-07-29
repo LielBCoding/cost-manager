@@ -9,6 +9,7 @@ function sendError(res, status, message) {
   return res.status(status).json({ id: status, message });
 }
 
+// turn a value into a number only if it really is one (rejects true/[]/''/{})
 function toNumber(value) {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value === 'string' && value.trim() !== '') {
@@ -24,20 +25,24 @@ router.post('/add', async (req, res) => {
   try {
     const { id, first_name, last_name, birthday } = req.body;
 
+    // all four fields must be present
     if (id === undefined || first_name === undefined ||
         last_name === undefined || birthday === undefined) {
       return sendError(res, 400, 'id, first_name, last_name and birthday are required');
     }
+    // id must be a whole number
     const idNum = toNumber(id);
     if (idNum === null || !Number.isInteger(idNum)) {
       return sendError(res, 400, 'id must be an integer number');
     }
+    // names must be real text
     if (typeof first_name !== 'string' || first_name.trim() === '') {
       return sendError(res, 400, 'first_name must be a non-empty string');
     }
     if (typeof last_name !== 'string' || last_name.trim() === '') {
       return sendError(res, 400, 'last_name must be a non-empty string');
     }
+    // birthday must be a valid date
     const birthdayDate = new Date(birthday);
     if (isNaN(birthdayDate.getTime())) {
       return sendError(res, 400, 'birthday is not a valid date');

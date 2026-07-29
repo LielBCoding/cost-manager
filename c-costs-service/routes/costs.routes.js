@@ -30,16 +30,20 @@ router.post('/add', async (req, res) => {
   try {
     const { description, category, userid, sum, date } = req.body;
 
+    // all four fields must be present
     if (description === undefined || category === undefined ||
         userid === undefined || sum === undefined) {
       return sendError(res, 400, 'description, category, userid and sum are required');
     }
+    // description must be real text
     if (typeof description !== 'string' || description.trim() === '') {
       return sendError(res, 400, 'description must be a non-empty string');
     }
+    // category has to be one of the five we support
     if (!CATEGORIES.includes(category)) {
       return sendError(res, 400, 'category must be one of: ' + CATEGORIES.join(', '));
     }
+    // userid and sum must be numbers (userid a whole number)
     const useridNum = toNumber(userid);
     const sumNum = toNumber(sum);
     if (useridNum === null || !Number.isInteger(useridNum)) {
@@ -94,6 +98,7 @@ router.get('/report', async (req, res) => {
     const yearNum = toNumber(req.query.year);
     const monthNum = toNumber(req.query.month);
 
+    // all three query params are required and must be whole numbers
     if (idNum === null || !Number.isInteger(idNum)) {
       return sendError(res, 400, 'id is required and must be an integer number');
     }
