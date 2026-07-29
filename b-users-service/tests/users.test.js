@@ -1,5 +1,4 @@
 // users.test.js
-// Tests for the users endpoints. The database is mocked so the tests run offline.
 const request = require('supertest');
 const express = require('express');
 

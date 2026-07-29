@@ -1,5 +1,4 @@
 // costs.routes.js
-// All cost-related endpoints: adding a cost item and getting a monthly report.
 const express = require('express');
 const router = express.Router();
 const logger = require('../logger');
@@ -7,19 +6,15 @@ const Cost = require('../models/cost.model');
 const User = require('../models/user.model');
 const Report = require('../models/report.model');
 
-// The supported categories (food, health, housing, sports, education)
 const CATEGORIES = Cost.CATEGORIES;
-
-// The order in which categories appear in the monthly report (matches the sample)
+// the order categories appear in the report
 const REPORT_ORDER = ['food', 'education', 'health', 'housing', 'sports'];
 
-// Sends a uniform error document that always contains id and message
 function sendError(res, status, message) {
   return res.status(status).json({ id: status, message });
 }
 
-// Converts a value to a finite number, but ONLY when it is a real number or a
-// non-empty numeric string. Booleans, arrays, objects, null and '' return null.
+// turn a value into a number only if it really is one (rejects true/[]/''/{})
 function toNumber(value) {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value === 'string' && value.trim() !== '') {
@@ -29,20 +24,16 @@ function toNumber(value) {
   return null;
 }
 
-// POST /api/add - add a new cost item
+// POST /api/add - add a cost item
 router.post('/add', async (req, res) => {
-  // Log that this endpoint was accessed
-  logger.info({ method: 'POST', url: '/api/add' }, 'costs: add cost endpoint accessed');
+  logger.info({ method: 'POST', url: '/api/add' }, 'add cost');
   try {
     const { description, category, userid, sum, date } = req.body;
 
-    // Validate that all required parameters were sent
     if (description === undefined || category === undefined ||
         userid === undefined || sum === undefined) {
       return sendError(res, 400, 'description, category, userid and sum are required');
     }
-
-    // Validate types / values
     if (typeof description !== 'string' || description.trim() === '') {
       return sendError(res, 400, 'description must be a non-empty string');
     }
@@ -56,13 +47,11 @@ router.post('/add', async (req, res) => {
     }
     if (sumNum === null) return sendError(res, 400, 'sum must be a number');
 
-    // The user must already exist before we can add a cost for them
+    // the user has to exist first
     const user = await User.findOne({ id: useridNum }).lean();
     if (!user) return sendError(res, 404, 'user ' + useridNum + ' does not exist');
 
-    // Decide which date to store for the cost item.
-    // If no date is sent, use the moment the request was received (now).
-    // The server does not allow adding a cost whose date belongs to the past.
+    // no date -> now. a date in the past is not allowed.
     let costDate = new Date();
     if (date !== undefined) {
       const parsed = new Date(date);
@@ -70,12 +59,11 @@ router.post('/add', async (req, res) => {
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       if (parsed < startOfToday) {
-        return sendError(res, 400, 'cannot add a cost with a date that belongs to the past');
+        return sendError(res, 400, 'cannot add a cost with a date in the past');
       }
       costDate = parsed;
     }
 
-    // Create and save the new cost document
     const cost = await Cost.create({
       description: description.trim(),
       category,
@@ -84,7 +72,6 @@ router.post('/add', async (req, res) => {
       date: costDate,
     });
 
-    // Reply with a JSON document that describes the cost item that was added
     return res.status(201).json({
       description: cost.description,
       category: cost.category,
@@ -94,21 +81,19 @@ router.post('/add', async (req, res) => {
       _id: cost._id,
     });
   } catch (err) {
-    logger.error({ err: err.message }, 'costs: add cost failed');
+    logger.error({ err: err.message }, 'add cost failed');
     return sendError(res, 500, err.message);
   }
 });
 
-// GET /api/report - get a monthly report grouped by category
+// GET /api/report - monthly report grouped by category
 router.get('/report', async (req, res) => {
-  // Log that this endpoint was accessed
-  logger.info({ method: 'GET', url: '/api/report' }, 'costs: report endpoint accessed');
+  logger.info({ method: 'GET', url: '/api/report' }, 'get report');
   try {
     const idNum = toNumber(req.query.id);
     const yearNum = toNumber(req.query.year);
     const monthNum = toNumber(req.query.month);
 
-    // Validate the query parameters (must be present and whole numbers)
     if (idNum === null || !Number.isInteger(idNum)) {
       return sendError(res, 400, 'id is required and must be an integer number');
     }
@@ -119,20 +104,14 @@ router.get('/report', async (req, res) => {
       return sendError(res, 400, 'month is required and must be between 1 and 12');
     }
 
-    /* Computed Design Pattern:
-       A report for a month that has already ended can never change again, because
-       the server does not allow adding costs with dates that belong to the past.
-       Therefore, the first time such a report is requested we compute it once and
-       SAVE it in the "reports" collection. Every later request for the same
-       (userid, year, month) is answered directly from that saved document instead
-       of recomputing it from the costs collection. A report for the current month
-       (or a future month) is always recomputed, because new costs may still be
-       added to it, so it must never be cached. */
+    /* Computed pattern:
+       1. if the month already ended, look for a saved report and return it
+       2. otherwise read the costs and build the report
+       3. save it only when the month is in the past (it can't change anymore) */
     const now = new Date();
     const isPast = (yearNum < now.getFullYear()) ||
                    (yearNum === now.getFullYear() && monthNum < (now.getMonth() + 1));
 
-    // For a past month, try to return the previously saved (computed) report
     if (isPast) {
       const cached = await Report.findOne({ userid: idNum, year: yearNum, month: monthNum }).lean();
       if (cached) {
@@ -140,12 +119,11 @@ router.get('/report', async (req, res) => {
       }
     }
 
-    // Compute the report: fetch this user's costs inside the requested month
     const start = new Date(yearNum, monthNum - 1, 1);
     const end = new Date(yearNum, monthNum, 1);
     const costs = await Cost.find({ userid: idNum, date: { $gte: start, $lt: end } }).lean();
 
-    // Group the costs by category. Every category appears even if it has no costs.
+    // group by category, every category is listed even when empty
     const grouped = REPORT_ORDER.map((cat) => ({
       [cat]: costs
         .filter((c) => c.category === cat)
@@ -154,7 +132,6 @@ router.get('/report', async (req, res) => {
 
     const report = { userid: idNum, year: yearNum, month: monthNum, costs: grouped };
 
-    // Save the computed report so future requests for this past month are cached
     if (isPast) {
       await Report.updateOne(
         { userid: idNum, year: yearNum, month: monthNum },
@@ -165,7 +142,7 @@ router.get('/report', async (req, res) => {
 
     return res.json(report);
   } catch (err) {
-    logger.error({ err: err.message }, 'costs: report failed');
+    logger.error({ err: err.message }, 'report failed');
     return sendError(res, 500, err.message);
   }
 });

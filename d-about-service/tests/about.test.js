@@ -1,5 +1,4 @@
 // about.test.js
-// Tests for the about (developers team) endpoint.
 const request = require('supertest');
 const express = require('express');
 const aboutRouter = require('../routes/about.routes');
