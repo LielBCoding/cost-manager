@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 // Simple health check route
 app.get('/', (req, res) => {
-  res.send('Hello from the Logs service (port ' + (process.env.PORT || 'unknown') + ')');
+  res.send('Hello from the Logs service');
 });
 
 // Routes
