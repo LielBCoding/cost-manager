@@ -39,9 +39,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ id: 500, message: err.message });
 });
 
-// Start the server first so the host detects the open port, then connect to MongoDB
-app.listen(PORT, () => logger.info('service listening on port ' + PORT));
+// Start the server first so the host detects the open port (startup messages go
+// to the console, not to the DB, so booting does not create log documents)
+app.listen(PORT, () => console.log('service listening on port ' + PORT));
 
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => logger.info('connected to MongoDB'))
-  .catch((err) => logger.error({ err: err.message }, 'failed to connect to MongoDB'));
+  .then(() => console.log('connected to MongoDB'))
+  .catch((err) => console.error('failed to connect to MongoDB:', err.message));

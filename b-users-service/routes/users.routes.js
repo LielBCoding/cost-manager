@@ -32,8 +32,8 @@ router.post('/add', async (req, res) => {
     }
     // id must be a whole number
     const idNum = toNumber(id);
-    if (idNum === null || !Number.isInteger(idNum)) {
-      return sendError(res, 400, 'id must be an integer number');
+    if (idNum === null || !Number.isInteger(idNum) || idNum <= 0) {
+      return sendError(res, 400, 'id must be a positive integer number');
     }
     // names must be real text
     if (typeof first_name !== 'string' || first_name.trim() === '') {
@@ -99,8 +99,8 @@ router.get('/users/:id', async (req, res) => {
   logger.info({ method: 'GET', url: '/api/users/' + req.params.id }, 'get user');
   try {
     const idNum = toNumber(req.params.id);
-    if (idNum === null || !Number.isInteger(idNum)) {
-      return sendError(res, 400, 'id must be an integer number');
+    if (idNum === null || !Number.isInteger(idNum) || idNum <= 0) {
+      return sendError(res, 400, 'id must be a positive integer number');
     }
 
     const user = await User.findOne({ id: idNum }).lean();

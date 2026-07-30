@@ -45,6 +45,12 @@ describe('Users service', () => {
       const res = await request(app).post('/api/add').send({ id: 'abc', first_name: 'a', last_name: 'b', birthday: '1990-01-01' });
       expect(res.statusCode).toBe(400);
     });
+
+    test('rejects an invalid birthday', async () => {
+      const res = await request(app).post('/api/add').send({ id: 5, first_name: 'a', last_name: 'b', birthday: 'not-a-date' });
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toMatch(/birthday/i);
+    });
   });
 
   describe('GET /api/users', () => {
@@ -54,6 +60,14 @@ describe('Users service', () => {
       expect(res.statusCode).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
       expect(res.body.length).toBe(1);
+    });
+
+    test('returns a 500 error document when the database fails', async () => {
+      User.find.mockReturnValue({ lean: () => Promise.reject(new Error('DB fail')) });
+      const res = await request(app).get('/api/users');
+      expect(res.statusCode).toBe(500);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body).toHaveProperty('message');
     });
   });
 
@@ -65,6 +79,14 @@ describe('Users service', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty('id', 123123);
       expect(res.body).toHaveProperty('total', 100);
+    });
+
+    test('returns total 0 for a user with no costs', async () => {
+      User.findOne.mockReturnValue({ lean: () => Promise.resolve({ id: 123123, first_name: 'mosh', last_name: 'israeli' }) });
+      Cost.aggregate.mockResolvedValue([]);
+      const res = await request(app).get('/api/users/123123');
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty('total', 0);
     });
 
     test('returns 404 for a non-existent user', async () => {

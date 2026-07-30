@@ -46,10 +46,10 @@ router.post('/add', async (req, res) => {
     // userid and sum must be numbers (userid a whole number)
     const useridNum = toNumber(userid);
     const sumNum = toNumber(sum);
-    if (useridNum === null || !Number.isInteger(useridNum)) {
-      return sendError(res, 400, 'userid must be an integer number');
+    if (useridNum === null || !Number.isInteger(useridNum) || useridNum <= 0) {
+      return sendError(res, 400, 'userid must be a positive integer number');
     }
-    if (sumNum === null) return sendError(res, 400, 'sum must be a number');
+    if (sumNum === null || sumNum <= 0) return sendError(res, 400, 'sum must be a positive number');
 
     // the user has to exist first
     const user = await User.findOne({ id: useridNum }).lean();
@@ -60,9 +60,8 @@ router.post('/add', async (req, res) => {
     if (date !== undefined) {
       const parsed = new Date(date);
       if (isNaN(parsed.getTime())) return sendError(res, 400, 'date is not a valid date');
-      const now = new Date();
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      if (parsed < startOfToday) {
+      // a cost cannot belong to the past
+      if (parsed < new Date()) {
         return sendError(res, 400, 'cannot add a cost with a date in the past');
       }
       costDate = parsed;
@@ -101,8 +100,8 @@ router.get('/report', async (req, res) => {
     const monthNum = toNumber(req.query.month);
 
     // all three query params are required and must be whole numbers
-    if (idNum === null || !Number.isInteger(idNum)) {
-      return sendError(res, 400, 'id is required and must be an integer number');
+    if (idNum === null || !Number.isInteger(idNum) || idNum <= 0) {
+      return sendError(res, 400, 'id is required and must be a positive integer number');
     }
     if (yearNum === null || !Number.isInteger(yearNum) || yearNum < 1970 || yearNum > 9999) {
       return sendError(res, 400, 'year is required and must be a valid year');

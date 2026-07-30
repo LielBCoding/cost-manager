@@ -21,4 +21,11 @@ describe('GET /api/about', () => {
       expect(Object.keys(member).sort()).toEqual(['first_name', 'last_name']);
     }
   });
+
+  test('returns our actual team members', async () => {
+    const res = await request(app).get('/api/about');
+    const names = res.body.map((m) => m.first_name + ' ' + m.last_name);
+    expect(names).toContain('Liel Babayn');
+    expect(names).toContain('Matan Dalal');
+  });
 });

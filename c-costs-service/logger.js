@@ -7,12 +7,20 @@ let logger;
 if (process.env.NODE_ENV === 'test') {
   logger = pino();
 } else {
-  // in normal runs send every log to two places: the mongo "logs" collection and the console
+  // in normal runs send every log to the mongo "logs" collection and also to the console
   logger = pino({
     transport: {
-      // target 1: the database (this is the required DB logging), target 2: stdout
       targets: [
-        { target: 'pino-mongodb', options: { uri: process.env.MONGODB_URI, database: process.env.DB_NAME || 'cost_manager', collection: 'logs' } },
+        // target 1: the database (this is the required DB logging)
+        {
+          target: 'pino-mongodb',
+          options: {
+            uri: process.env.MONGODB_URI,
+            database: process.env.DB_NAME || 'cost_manager',
+            collection: 'logs',
+          },
+        },
+        // target 2: the console
         { target: 'pino/file', options: { destination: 1 } },
       ],
     },
